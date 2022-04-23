@@ -1,10 +1,11 @@
 # Python
 from optparse import Option
 from turtle import update
+from unittest import result
 from uuid import UUID
 from datetime import date, datetime
 from typing import Optional, List
-
+import json
 
 # Pydantic
 from pydantic import BaseModel, EmailStr
@@ -13,6 +14,7 @@ from pydantic import Field
 # FastAPI
 
 from fastapi import FastAPI, status
+from fastapi import Body
 
 app = FastAPI()
 
@@ -37,6 +39,13 @@ class UserLogin(User):
         max_length=150
     )
 
+
+class UserRegister(User):
+    password: str = Field(
+        ...,
+        min_length=8,
+        max_length=150
+    )
 
 # class User(UserBase):
 #     pass
@@ -66,8 +75,31 @@ class Tweet(BaseModel):
     summary="Register a User",
     tags=["Users"]
 )
-def signup():
-    pass
+def signup(user: UserRegister = Body(...)):
+    """
+    SignUp
+
+    This path operation registers a user in the app
+
+    Parameters:
+        - Request body parameters
+            - user: UserRegister
+    Return a json with the basic user information:
+        - user id: UUID
+        - email: EmailStr
+        - first_name: str
+        - last_name: str
+        - birth_data: datetime
+    """
+    with open("users.json", "r+", encoding="utf-8") as f:
+        results = json.loads(f.read())
+        user_dict = user.dict()
+        user_dict["user_id"] = str(user_dict["user_id"])
+        user_dict["birth_date"] = str(user_dict["birth_date"])
+        results.append(user_dict)
+        f.seek(0)
+        f.write(json.dumps(results))
+        return user
 
 
 # Login a User
@@ -92,10 +124,26 @@ def login():
     tags=["Users"]
 )
 def show_all_users():
-    pass
+    """
+    This Path Operations shows all users un the app
 
+    Parameters:
+        -
+
+    Return a json list with all users in the app, with the following keys:
+        - user id: UUID
+        - email: EmailStr
+        - first_name: str
+        - last_name: str
+        - birth_data: datetime
+    """
+    with open("users.json", "r", enconding="utf-8") as f:
+        results = json.loads(f.read())
+        return results
 
 # Show a user
+
+
 @app.get(
     path="/users/{user_id}",
     response_model=User,
