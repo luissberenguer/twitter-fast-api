@@ -1,6 +1,8 @@
 # Python
+from optparse import Option
+from turtle import update
 from uuid import UUID
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
 
@@ -17,7 +19,7 @@ app = FastAPI()
 # Models
 
 
-class UserBase(BaseModel):
+class User(BaseModel):
     user_id: UUID = Field(...)
     email: EmailStr = Field(...)
     first_name: str = Field(
@@ -28,7 +30,7 @@ class UserBase(BaseModel):
     birth_date: Optional[date] = Field(default=None)
 
 
-class UserLogin(UserBase):
+class UserLogin(User):
     password: str = Field(
         ...,
         min_length=8,
@@ -41,7 +43,15 @@ class UserLogin(UserBase):
 
 
 class Tweet(BaseModel):
-    pass
+    tweet_id: str = Field(...)
+    content: str = Field(
+        ...,
+        max_length=256,
+        min_length=1
+    )
+    created_at: datetime = Field(default=datetime.now())
+    updated_at: Optional[datetime] = Field(default=None)
+    by: User = Field(...)
 
 
 @app.get(path="/")
