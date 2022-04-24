@@ -1,7 +1,4 @@
 # Python
-from optparse import Option
-from turtle import update
-from unittest import result
 from uuid import UUID
 from datetime import date, datetime
 from typing import Optional, List
@@ -46,9 +43,6 @@ class UserRegister(User):
         min_length=8,
         max_length=150
     )
-
-# class User(UserBase):
-#     pass
 
 
 class Tweet(BaseModel):
@@ -159,7 +153,7 @@ def show_user():
 @app.delete(
     path="/users/{user_id}/delete",
     response_model=User,
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_200_OK,
     summary="Delete a User",
     tags=["Users"]
 )
@@ -201,7 +195,7 @@ def home():
     summary="Post a Tweet",
     tags=["Tweets"]
 )
-def home():
+def home(tweet: Tweet = Body(...)):
     pass
 
 # Show a Tweet
